@@ -1,6 +1,17 @@
 <div class="container mt-4">
   <h2>Data Prodi</h2>
 
+  <!-- Tombol untuk membuka modal -->
+  <button
+    type="button"
+    class="btn btn-primary mb-3"
+    data-bs-toggle="modal"
+    data-bs-target="#tambahProdiModal"
+  >
+    Tambah Prodi
+  </button>
+  <!-- Tombol dengan Bootstrap yang membuka modal menggunakan atribut `data-bs-toggle` dan `data-bs-target`. -->
+
   <!-- Loader -->
   <div class="d-flex justify-content-center mt-4" *ngIf="isLoading">
     <!-- Loader ditampilkan jika properti `isLoading` bernilai true -->
@@ -11,24 +22,112 @@
     </div>
   </div>
 
-  <table class="table table-bordered table-striped" *ngIf="!isLoading">
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Nama Prodi</th>
-        <th>Singkatan</th>
-        <th>Fakultas</th>
-        <!-- <th>Aksi</th> -->
-      </tr>
-    </thead>
-    <tbody>
-      <!-- Data Prodi akan di-loop di sini -->
-      <tr *ngFor="let item of prodi; let i = index">
-        <td>{{ i + 1 }}</td>
-        <td>{{ item.nama }}</td>
-        <td>{{ item.singkatan }}</td>
-        <td>{{ item.fakultas_id.nama }}</td>
-      </tr>
-    </tbody>
-  </table>
+  <!-- Modal Tambah Prodi -->
+  <div
+    class="modal fade"
+    id="tambahProdiModal"
+    tabindex="-1"
+    aria-labelledby="tambahProdiModalLabel"
+    aria-hidden="true"
+  >
+    <!-- Modal Bootstrap dengan ID unik untuk menampilkan formulir tambah prodi. -->
+    <div class="modal-dialog">
+      <!-- Dialog modal dengan layout default Bootstrap. -->
+      <div class="modal-content">
+        <!-- Konten modal -->
+        <div class="modal-header">
+          <!-- Header modal -->
+          <h5 class="modal-title" id="tambahProdiModalLabel">
+            Tambah Program Studi
+          </h5>
+          <!-- Judul modal -->
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+          <!-- Tombol untuk menutup modal -->
+        </div>
+        <div class="modal-body">
+          <!-- Bagian isi modal -->
+          <form [formGroup]="prodiForm" (ngSubmit)="addProdi()">
+            <!-- Form Angular yang terhubung dengan `prodiForm`. -->
+            <div class="mb-3">
+              <!-- Input untuk nama prodi -->
+              <label for="nama" class="form-label">Nama Prodi</label>
+              <input
+                id="nama"
+                type="text"
+                class="form-control"
+                formControlName="nama"
+              />
+              <!-- Input menggunakan formControlName Angular untuk menghubungkan field dengan formGroup. -->
+            </div>
+            <div class="mb-3">
+              <!-- Input untuk singkatan prodi -->
+              <label for="singkatan" class="form-label">Singkatan</label>
+              <input
+                id="singkatan"
+                type="text"
+                class="form-control"
+                formControlName="singkatan"
+              />
+            </div>
+            <div class="mb-3">
+              <!-- Dropdown untuk memilih fakultas -->
+              <label for="fakultas" class="form-label">Fakultas</label>
+              <select
+                id="fakultas"
+                class="form-select"
+                formControlName="fakultas_id"
+              >
+                <option
+                  *ngFor="let fakultas of fakultas"
+                  [value]="fakultas._id"
+                >
+                  {{ fakultas.nama }}
+                </option>
+                <!-- Menggunakan *ngFor untuk membuat opsi dropdown berdasarkan data fakultas. -->
+              </select>
+            </div>
+            <button
+              type="submit"
+              class="btn btn-primary"
+              [disabled]="isSubmitting"
+            >
+              {{ isSubmitting ? "Menyimpan..." : "Tambah Prodi" }}
+            </button>
+            <!-- Tombol submit dengan state dinamis berdasarkan isSubmitting. -->
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!isLoading">
+    <table class="table table-bordered table-striped" >
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Nama Prodi</th>
+          <th>Singkatan</th>
+          <th>Fakultas</th>
+          <!-- <th>Aksi</th> -->
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Data Prodi akan di-loop di sini -->
+        <tr *ngFor="let item of prodi| paginate: { itemsPerPage: itemsPerPage, currentPage: currentPage }; index as i">
+          <td>{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
+          <td>{{ item.nama }}</td>
+          <td>{{ item.singkatan }}</td>
+          <td>{{ item.fakultas_id.nama }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <pagination-controls (pageChange)="currentPage = $event">
+    </pagination-controls>
+  </div>
 </div>
