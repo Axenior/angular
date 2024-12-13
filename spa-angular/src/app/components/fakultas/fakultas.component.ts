@@ -1,56 +1,61 @@
-import { CommonModule } from '@angular/common';  // Mengimpor CommonModule agar dapat menggunakan fitur-fitur dasar Angular seperti *ngIf dan *ngFor
-import { Component, OnInit, inject } from '@angular/core';  // Mengimpor dekorator Component, lifecycle hook OnInit, dan inject untuk injeksi HttpClient pada komponen standalone
-import { HttpClient } from '@angular/common/http';  // Mengimpor HttpClient untuk melakukan HTTP request
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';  // Tambahkan untuk menangani formulir
+import { CommonModule } from '@angular/common'; // Mengimpor CommonModule agar dapat menggunakan fitur-fitur dasar Angular seperti *ngIf dan *ngFor
+import { Component, OnInit, inject } from '@angular/core'; // Mengimpor dekorator Component, lifecycle hook OnInit, dan inject untuk injeksi HttpClient pada komponen standalone
+import { HttpClient } from '@angular/common/http'; // Mengimpor HttpClient untuk melakukan HTTP request
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms'; // Tambahkan untuk menangani formulir
 import * as bootstrap from 'bootstrap';
 import { NgxPaginationModule } from 'ngx-pagination';
 
 @Component({
-  selector: 'app-fakultas',  // Nama selector untuk komponen ini. Komponen akan digunakan di template dengan tag <app-fakultas></app-fakultas>
-  standalone: true,  // Menyatakan bahwa komponen ini adalah komponen standalone dan tidak membutuhkan module tambahan
-  imports: [CommonModule, ReactiveFormsModule, NgxPaginationModule],  // Mengimpor CommonModule untuk memungkinkan penggunaan direktif Angular standar seperti *ngIf dan *ngFor di template
-  templateUrl: './fakultas.component.html',  // Path ke file template HTML untuk komponen ini
-  styleUrl: './fakultas.component.css'  // Path ke file CSS untuk komponen ini
+  selector: 'app-fakultas', // Nama selector untuk komponen ini. Komponen akan digunakan di template dengan tag <app-fakultas></app-fakultas>
+  standalone: true, // Menyatakan bahwa komponen ini adalah komponen standalone dan tidak membutuhkan module tambahan
+  imports: [CommonModule, ReactiveFormsModule, NgxPaginationModule], // Mengimpor CommonModule untuk memungkinkan penggunaan direktif Angular standar seperti *ngIf dan *ngFor di template
+  templateUrl: './fakultas.component.html', // Path ke file template HTML untuk komponen ini
+  styleUrl: './fakultas.component.css', // Path ke file CSS untuk komponen ini
 })
-export class FakultasComponent implements OnInit {  // Deklarasi komponen dengan mengimplementasikan lifecycle hook OnInit
-  fakultas: any[] = [];  // Mendeklarasikan properti fakultas yang akan menyimpan data yang diterima dari API
+export class FakultasComponent implements OnInit {
+  // Deklarasi komponen dengan mengimplementasikan lifecycle hook OnInit
+  fakultas: any[] = []; // Mendeklarasikan properti fakultas yang akan menyimpan data yang diterima dari API
   currentPage = 1;
   itemsPerPage = 5;
-  
-  apiUrl = 'https://belajar-express-generator.vercel.app/api/fakultas';  // URL API yang digunakan untuk mendapatkan data fakultas
+
+  apiFakultasUrl = 'https://belajar-express-generator.vercel.app/api/fakultas'; // URL API yang digunakan untuk mendapatkan data fakultas
   // apiUrl = "https://crud-express-seven.vercel.app/api/fakultas";
-  isLoading = true;  // Properti untuk status loading, digunakan untuk menunjukkan loader saat data sedang diambil
+  isLoading = true; // Properti untuk status loading, digunakan untuk menunjukkan loader saat data sedang diambil
 
-  fakultasForm: FormGroup;  // Tambahkan untuk mengelola data formulir
-  isSubmitting = false;  // Status untuk mencegah double submit
+  fakultasForm: FormGroup; // Tambahkan untuk mengelola data formulir
+  isSubmitting = false; // Status untuk mencegah double submit
 
-  private http = inject(HttpClient);  // Menggunakan inject untuk mendapatkan instance HttpClient di dalam komponen standalone (untuk Angular versi terbaru yang mendukung pendekatan ini)
+  private http = inject(HttpClient); // Menggunakan inject untuk mendapatkan instance HttpClient di dalam komponen standalone (untuk Angular versi terbaru yang mendukung pendekatan ini)
 
-  private fb = inject(FormBuilder);  // Inject FormBuilder untuk membuat FormGroup
+  private fb = inject(FormBuilder); // Inject FormBuilder untuk membuat FormGroup
 
   constructor() {
     // Inisialisasi form dengan kontrol nama dan singkatan
     this.fakultasForm = this.fb.group({
       nama: [''],
-      singkatan: ['']
+      singkatan: [''],
     });
   }
 
-  ngOnInit(): void {  // Lifecycle hook ngOnInit dipanggil saat komponen diinisialisasi
-    this.getFakultas();  // Memanggil method getFakultas saat komponen diinisialisasi
+  ngOnInit(): void {
+    // Lifecycle hook ngOnInit dipanggil saat komponen diinisialisasi
+    this.getFakultas(); // Memanggil method getFakultas saat komponen diinisialisasi
   }
 
-  getFakultas(): void {  // Method untuk mengambil data fakultas dari API
+  getFakultas(): void {
+    // Method untuk mengambil data fakultas dari API
     // Mengambil data dari API menggunakan HttpClient
-    this.http.get<any[]>(this.apiUrl).subscribe({
-      next: (data) => {  // Callback untuk menangani data yang diterima dari API
-        this.fakultas = data;  // Menyimpan data yang diterima ke dalam properti fakultas
-        console.log('Data Fakultas:', this.fakultas);  // Mencetak data fakultas di console untuk debugging
-        this.isLoading = false;  // Mengubah status loading menjadi false, yang akan menghentikan tampilan loader
+    this.http.get<any[]>(this.apiFakultasUrl).subscribe({
+      next: (data) => {
+        // Callback untuk menangani data yang diterima dari API
+        this.fakultas = data; // Menyimpan data yang diterima ke dalam properti fakultas
+        console.log('Data Fakultas:', this.fakultas); // Mencetak data fakultas di console untuk debugging
+        this.isLoading = false; // Mengubah status loading menjadi false, yang akan menghentikan tampilan loader
       },
-      error: (err) => {  // Callback untuk menangani jika terjadi error saat mengambil data
-        console.error('Error fetching fakultas data:', err);  // Mencetak error di console untuk debugging
-        this.isLoading = false;  // Tetap mengubah status loading menjadi false meskipun terjadi error, untuk menghentikan loader
+      error: (err) => {
+        // Callback untuk menangani jika terjadi error saat mengambil data
+        console.error('Error fetching fakultas data:', err); // Mencetak error di console untuk debugging
+        this.isLoading = false; // Tetap mengubah status loading menjadi false meskipun terjadi error, untuk menghentikan loader
       },
     });
   }
@@ -58,18 +63,22 @@ export class FakultasComponent implements OnInit {  // Deklarasi komponen dengan
   // Method untuk menambahkan fakultas
   addFakultas(): void {
     if (this.fakultasForm.valid) {
-      this.isSubmitting = true;  // Set status submitting
-      this.http.post(this.apiUrl, this.fakultasForm.value).subscribe({
+      this.isSubmitting = true; // Set status submitting
+      this.http.post(this.apiFakultasUrl, this.fakultasForm.value).subscribe({
         next: (response) => {
           console.log('Data berhasil ditambahkan:', response);
-          this.getFakultas();  // Refresh data fakultas
-          this.fakultasForm.reset();  // Reset formulir
-          this.isSubmitting = false;  // Reset status submitting
+          this.getFakultas(); // Refresh data fakultas
+          this.fakultasForm.reset(); // Reset formulir
+          this.isSubmitting = false; // Reset status submitting
 
           // Tutup modal setelah data berhasil ditambahkan
-          const modalElement = document.getElementById('tambahFakultasModal') as HTMLElement;
+          const modalElement = document.getElementById(
+            'tambahFakultasModal'
+          ) as HTMLElement;
           if (modalElement) {
-            const modalInstance = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
+            const modalInstance =
+              bootstrap.Modal.getInstance(modalElement) ||
+              new bootstrap.Modal(modalElement);
             modalInstance.hide();
 
             // Hapus elemen backdrop jika ada
@@ -87,6 +96,87 @@ export class FakultasComponent implements OnInit {  // Deklarasi komponen dengan
         error: (err) => {
           console.error('Error menambahkan fakultas:', err);
           this.isSubmitting = false;
+        },
+      });
+    }
+  }
+
+  editFakultasId: string | null = null; // ID Fakultas yang sedang diubah
+
+  // Method untuk mendapatkan data Fakultas berdasarkan ID
+  getFakultasById(_id: string): void {
+    this.editFakultasId = _id; // Menyimpan ID Fakultas yang dipilih
+    this.http.get(`${this.apiFakultasUrl}/${_id}`).subscribe({
+      next: (data: any) => {
+        // Isi form dengan data yang diterima dari API
+        this.fakultasForm.patchValue({
+          nama: data.nama,
+          singkatan: data.singkatan,
+        });
+
+        // Buka modal edit
+        const modalElement = document.getElementById(
+          'editFakultasModal'
+        ) as HTMLElement;
+        if (modalElement) {
+          const modalInstance =
+            bootstrap.Modal.getInstance(modalElement) ||
+            new bootstrap.Modal(modalElement);
+          modalInstance.show();
+        }
+      },
+      error: (err) => {
+        console.error('Error fetching Fakultas data by ID:', err);
+      },
+    });
+  }
+
+  // Method untuk mengupdate data fakultas
+  updateFakultas(): void {
+    if (this.fakultasForm.valid) {
+      this.isSubmitting = true;
+
+      this.http
+        .put(
+          `${this.apiFakultasUrl}/${this.editFakultasId}`,
+          this.fakultasForm.value
+        )
+        .subscribe({
+          next: (response) => {
+            console.log('Fakultas berhasil diperbarui:', response);
+            this.getFakultas();
+            // this.getProdi();
+            this.fakultasForm.reset();
+            this.isSubmitting = false;
+
+            // Tutup modal edit setelah data berhasil diupdate
+            const modalElement = document.getElementById(
+              'editFakultasModal'
+            ) as HTMLElement;
+            if (modalElement) {
+              const modalInstance = bootstrap.Modal.getInstance(modalElement);
+              modalInstance?.hide();
+            }
+          },
+          error: (err) => {
+            console.error('Error updating mahasiswa:', err);
+            this.isSubmitting = false;
+          },
+        });
+    }
+  }
+
+  // Method untuk menghapus Fakultas
+  deleteFakultas(_id: string): void {
+    if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
+      // Konfirmasi penghapusan
+      this.http.delete(`${this.apiFakultasUrl}/${_id}`).subscribe({
+        next: () => {
+          console.log(`Fakultas dengan ID ${_id} berhasil dihapus`);
+          this.getFakultas(); // Refresh data Fakultas setelah penghapusan
+        },
+        error: (err) => {
+          console.error('Error menghapus Fakultas:', err); // Log error jika penghapusan gagal
         },
       });
     }

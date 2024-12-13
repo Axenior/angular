@@ -62,14 +62,25 @@
               />
             </div>
             <div class="mb-3">
-              <label for="jenis_kelamin" class="form-label">jenis_kelamin</label>
-              <select name="" id="jenis_kelamin" class="form-select" formControlName="jenis_kelamin">
-                <option value="L">Laki - Laki</option>
-                <option value="P">Perempuan</option>
+              <label for="jenis_kelamin" class="form-label"
+                >Jenis Kelamin</label
+              >
+              <select
+                name=""
+                id="jenis_kelamin"
+                class="form-select"
+                formControlName="jenis_kelamin"
+              >
+                <option
+                  *ngFor="let jenisKelamin of jenisKelamin"
+                  [value]="jenisKelamin"
+                >
+                  {{ jenisKelamin == "L" ? "Laki - Laki" : "Perempuan" }}
+                </option>
               </select>
             </div>
             <div class="mb-3">
-              <label for="asal_sekolah" class="form-label">asal_sekolah</label>
+              <label for="asal_sekolah" class="form-label">Asal Sekolah</label>
               <input
                 id="asal_sekolah"
                 type="text"
@@ -77,7 +88,7 @@
                 formControlName="asal_sekolah"
               />
             </div>
-            <div class="mb-3">
+            <!-- <div class="mb-3">
               <label for="foto" class="form-label">foto</label>
               <input
                 id="foto"
@@ -85,18 +96,11 @@
                 class="form-control"
                 formControlName="foto"
               />
-            </div>
+            </div> -->
             <div class="mb-3">
               <label for="prodi" class="form-label">Prodi</label>
-              <select
-                id="prodi"
-                class="form-select"
-                formControlName="prodi_id"
-              >
-                <option
-                  *ngFor="let prodi of prodi"
-                  [value]="prodi._id"
-                >
+              <select id="prodi" class="form-select" formControlName="prodi_id">
+                <option *ngFor="let prodi of prodi" [value]="prodi._id">
                   {{ prodi.nama }}
                 </option>
                 <!-- Menggunakan *ngFor untuk membuat opsi dropdown berdasarkan data fakultas. -->
@@ -107,9 +111,103 @@
               class="btn btn-primary"
               [disabled]="isSubmitting"
             >
-              {{ isSubmitting ? "Menyimpan..." : "Tambah Prodi" }}
+              {{ isSubmitting ? "Menyimpan..." : "Tambah Mahasiswa" }}
             </button>
             <!-- Tombol submit dengan state dinamis berdasarkan isSubmitting. -->
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Edit Mahasiswa -->
+  <div
+    class="modal fade"
+    id="editMahasiswaModal"
+    tabindex="-1"
+    aria-labelledby="editMahasiswaModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editMahasiswaModalLabel">
+            Ubah Program Studi
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <form [formGroup]="mahasiswaForm" (ngSubmit)="updateMahasiswa()">
+            <div class="mb-3">
+              <label for="editNama" class="form-label">Nama Mahasiswa</label>
+              <input
+                id="editNama"
+                type="text"
+                class="form-control"
+                formControlName="nama"
+              />
+            </div>
+            <div class="mb-3">
+              <label for="editNpm" class="form-label">NPM</label>
+              <input
+                id="editNpm"
+                type="text"
+                class="form-control"
+                formControlName="npm"
+              />
+            </div>
+            <div class="mb-3">
+              <label for="editJenisKelamin" class="form-label"
+                >Jenis Kelamin</label
+              >
+              <select
+                id="editJenisKelamin"
+                class="form-select"
+                formControlName="jenis_kelamin"
+              >
+                <option
+                  *ngFor="let jenisKelamin of jenisKelamin"
+                  [value]="jenisKelamin"
+                >
+                  {{ jenisKelamin == "L" ? "Laki - Laki" : "Perempuan" }}
+                </option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="editAsalSekolah" class="form-label"
+                >Asal Sekolah</label
+              >
+              <input
+                id="editAsalSekolah"
+                type="text"
+                class="form-control"
+                formControlName="asal_sekolah"
+              />
+            </div>
+            <div class="mb-3">
+              <label for="editProdi" class="form-label">Prodi</label>
+              <select
+                id="editProdi"
+                class="form-select"
+                formControlName="prodi_id"
+              >
+                <option *ngFor="let prodi of prodi" [value]="prodi._id">
+                  {{ prodi.nama }}
+                </option>
+              </select>
+            </div>
+            <button
+              type="submit"
+              class="btn btn-primary"
+              [disabled]="isSubmitting"
+            >
+              {{ isSubmitting ? "Menyimpan..." : "Ubah Mahasiswa" }}
+            </button>
           </form>
         </div>
       </div>
@@ -125,20 +223,41 @@
       <!-- Teks alternatif untuk pembaca layar, membantu aksesibilitas -->
     </div>
   </div>
-  
+
   <div *ngIf="!isLoading" class="row">
     <div
-      *ngFor="let item of mahasiswa | paginate: { itemsPerPage: itemsPerPage, currentPage: currentPage }; index as i"
+      *ngFor="
+        let item of mahasiswa
+          | paginate : { itemsPerPage: itemsPerPage, currentPage: currentPage };
+        index as i
+      "
       class="col-lg-4 mb-4 d-flex justify-content-center"
     >
       <div class="card card-profile text-center rounded-4 w-100">
-        <div class="card-body">
+        <div class="card-body pt-5">
+          <!-- Tombol Edit dan Hapus -->
+          <div class="position-absolute top-0 end-0 m-2 d-flex gap-1">
+            <button
+              class="btn btn-sm btn-primary"
+              style="padding: 0.25rem 0.5rem"
+              (click)="getMahasiswaById(item._id)"
+            >
+              Edit
+            </button>
+            <button
+              class="btn btn-sm btn-danger"
+              style="padding: 0.25rem 0.5rem"
+              (click)="deleteMahasiswa(item._id)"
+            >
+              Hapus
+            </button>
+          </div>
           <!-- <img
-              src="{{ item.foto }}"
-              alt="Avatar"
-              class="avatar img-fluid"
-              style="width: 60px; height: 60px; margin: auto"
-            /> -->
+            alt="Avatar"
+            src="{{ 'http://localhost:3000/' + item.foto }}"
+            class="avatar img-fluid"
+            style="width: 60px; height: 60px; margin: auto"
+          /> -->
           <h3 class="fs-5 fw-bold mt-2 mb-0">{{ item.nama }}</h3>
           <span class="text-secondary d-block">{{ item.npm }}</span>
           <span class="text-secondary d-block mb-3">{{
@@ -151,7 +270,7 @@
           >
             <div class="text-secondary fw-medium small">Jurusan</div>
             <p class="mb-1 text-bold fw-medium small">
-              {{ item.prodi_id.nama }}
+              {{ item.prodi_id?.nama || "" }}
             </p>
             <div
               class="border-end position-absolute end-0 top-50 translate-middle-y"
