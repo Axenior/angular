@@ -51,7 +51,9 @@ export class MahasiswaComponent implements OnInit {
   }
 
   getMahasiswa(): void {
-    this.http.get<any[]>(this.apiMahasiswaUrl).subscribe({
+    const token = localStorage.getItem('authToken');
+    const headers = { Authorization: `Bearer ${token}` };
+    this.http.get<any[]>(this.apiMahasiswaUrl, { headers }).subscribe({
       // Melakukan HTTP GET ke API prodi.
       next: (data) => {
         // Callback jika request berhasil.
@@ -69,7 +71,10 @@ export class MahasiswaComponent implements OnInit {
 
   // Mengambil data program studi
   getProdi(): void {
-    this.http.get<any[]>(this.apiProdiUrl).subscribe({
+    const token = localStorage.getItem('authToken');
+    const headers = { Authorization: `Bearer ${token}` };
+
+    this.http.get<any[]>(this.apiProdiUrl, { headers }).subscribe({
       // Melakukan HTTP GET ke API prodi.
       next: (data) => {
         // Callback jika request berhasil.
@@ -89,7 +94,11 @@ export class MahasiswaComponent implements OnInit {
   // Method untuk mendapatkan data Mahasiswa berdasarkan ID
   getMahasiswaById(_id: string): void {
     this.editMahasiswaId = _id; // Menyimpan ID Mahasiswa yang dipilih
-    this.http.get(`${this.apiMahasiswaUrl}/${_id}`).subscribe({
+
+    const token = localStorage.getItem('authToken');
+    const headers = { Authorization: `Bearer ${token}` };
+
+    this.http.get(`${this.apiMahasiswaUrl}/${_id}`, { headers }).subscribe({
       next: (data: any) => {
         // Isi form dengan data yang diterima dari API
         this.mahasiswaForm.patchValue({
@@ -122,51 +131,57 @@ export class MahasiswaComponent implements OnInit {
     if (this.mahasiswaForm.valid) {
       // Memastikan form valid sebelum mengirim data.
       this.isSubmitting = true; // Mengaktifkan indikator pengiriman data.
-      this.http.post(this.apiMahasiswaUrl, this.mahasiswaForm.value).subscribe({
-        // Melakukan HTTP POST ke API prodi.
-        next: (response) => {
-          // Callback jika request berhasil.
-          console.log('Prodi berhasil ditambahkan:', response); // Log respons ke konsol.
-          this.getMahasiswa(); // Refresh data prodi setelah penambahan.
-          this.mahasiswaForm.reset(); // Reset form setelah data dikirim.
-          this.isSubmitting = false; // Menonaktifkan indikator pengiriman.
 
-          // Tutup modal setelah data berhasil ditambahkan
-          const modalElement = document.getElementById(
-            'tambahMahasiswaModal'
-          ) as HTMLElement; // Ambil elemen modal berdasarkan ID.
-          if (modalElement) {
-            // Periksa jika elemen modal ada.
-            const modalInstance =
-              bootstrap.Modal.getInstance(modalElement) ||
-              new bootstrap.Modal(modalElement); // Ambil atau buat instance modal.
-            modalInstance.hide(); // Sembunyikan modal.
+      const token = localStorage.getItem('authToken');
+      const headers = { Authorization: `Bearer ${token}` };
 
-            // Pastikan untuk menghapus atribut dan gaya pada body setelah modal ditutup
-            modalElement.addEventListener(
-              'hidden.bs.modal',
-              () => {
-                // Tambahkan event listener untuk modal yang ditutup.
-                const backdrop = document.querySelector('.modal-backdrop'); // Cari elemen backdrop modal.
-                if (backdrop) {
-                  backdrop.remove(); // Hapus backdrop jika ada.
-                }
+      this.http
+        .post(this.apiMahasiswaUrl, this.mahasiswaForm.value, { headers })
+        .subscribe({
+          // Melakukan HTTP POST ke API prodi.
+          next: (response) => {
+            // Callback jika request berhasil.
+            console.log('Prodi berhasil ditambahkan:', response); // Log respons ke konsol.
+            this.getMahasiswa(); // Refresh data prodi setelah penambahan.
+            this.mahasiswaForm.reset(); // Reset form setelah data dikirim.
+            this.isSubmitting = false; // Menonaktifkan indikator pengiriman.
 
-                // Pulihkan scroll pada body
-                document.body.classList.remove('modal-open'); // Hapus class 'modal-open' dari body.
-                document.body.style.overflow = ''; // Pulihkan properti overflow pada body.
-                document.body.style.paddingRight = ''; // Pulihkan padding body.
-              },
-              { once: true }
-            ); // Event listener hanya dijalankan sekali.
-          }
-        },
-        error: (err) => {
-          // Callback jika request gagal.
-          console.error('Error menambahkan mahasiswa:', err); // Log error ke konsol.
-          this.isSubmitting = false; // Menonaktifkan indikator pengiriman.
-        },
-      });
+            // Tutup modal setelah data berhasil ditambahkan
+            const modalElement = document.getElementById(
+              'tambahMahasiswaModal'
+            ) as HTMLElement; // Ambil elemen modal berdasarkan ID.
+            if (modalElement) {
+              // Periksa jika elemen modal ada.
+              const modalInstance =
+                bootstrap.Modal.getInstance(modalElement) ||
+                new bootstrap.Modal(modalElement); // Ambil atau buat instance modal.
+              modalInstance.hide(); // Sembunyikan modal.
+
+              // Pastikan untuk menghapus atribut dan gaya pada body setelah modal ditutup
+              modalElement.addEventListener(
+                'hidden.bs.modal',
+                () => {
+                  // Tambahkan event listener untuk modal yang ditutup.
+                  const backdrop = document.querySelector('.modal-backdrop'); // Cari elemen backdrop modal.
+                  if (backdrop) {
+                    backdrop.remove(); // Hapus backdrop jika ada.
+                  }
+
+                  // Pulihkan scroll pada body
+                  document.body.classList.remove('modal-open'); // Hapus class 'modal-open' dari body.
+                  document.body.style.overflow = ''; // Pulihkan properti overflow pada body.
+                  document.body.style.paddingRight = ''; // Pulihkan padding body.
+                },
+                { once: true }
+              ); // Event listener hanya dijalankan sekali.
+            }
+          },
+          error: (err) => {
+            // Callback jika request gagal.
+            console.error('Error menambahkan mahasiswa:', err); // Log error ke konsol.
+            this.isSubmitting = false; // Menonaktifkan indikator pengiriman.
+          },
+        });
     }
   }
 
@@ -208,15 +223,19 @@ export class MahasiswaComponent implements OnInit {
   deleteMahasiswa(_id: string): void {
     if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
       // Konfirmasi penghapusan
-      this.http.delete(`${this.apiMahasiswaUrl}/${_id}`).subscribe({
-        next: () => {
-          console.log(`Mahasiswa dengan ID ${_id} berhasil dihapus`);
-          this.getMahasiswa(); // Refresh data Mahasiswa setelah penghapusan
-        },
-        error: (err) => {
-          console.error('Error menghapus mahasiwa:', err); // Log error jika penghapusan gagal
-        },
-      });
+      const token = localStorage.getItem('authToken');
+      const headers = { Authorization: `Bearer ${token}` };
+      this.http
+        .delete(`${this.apiMahasiswaUrl}/${_id}`, { headers })
+        .subscribe({
+          next: () => {
+            console.log(`Mahasiswa dengan ID ${_id} berhasil dihapus`);
+            this.getMahasiswa(); // Refresh data Mahasiswa setelah penghapusan
+          },
+          error: (err) => {
+            console.error('Error menghapus mahasiwa:', err); // Log error jika penghapusan gagal
+          },
+        });
     }
   }
 }

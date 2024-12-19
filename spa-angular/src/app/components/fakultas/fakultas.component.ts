@@ -45,7 +45,10 @@ export class FakultasComponent implements OnInit {
   getFakultas(): void {
     // Method untuk mengambil data fakultas dari API
     // Mengambil data dari API menggunakan HttpClient
-    this.http.get<any[]>(this.apiFakultasUrl).subscribe({
+    const token = localStorage.getItem('authToken');
+    const headers = { Authorization: `Bearer ${token}` };
+
+    this.http.get<any[]>(this.apiFakultasUrl, { headers }).subscribe({
       next: (data) => {
         // Callback untuk menangani data yang diterima dari API
         this.fakultas = data; // Menyimpan data yang diterima ke dalam properti fakultas
@@ -64,40 +67,46 @@ export class FakultasComponent implements OnInit {
   addFakultas(): void {
     if (this.fakultasForm.valid) {
       this.isSubmitting = true; // Set status submitting
-      this.http.post(this.apiFakultasUrl, this.fakultasForm.value).subscribe({
-        next: (response) => {
-          console.log('Data berhasil ditambahkan:', response);
-          this.getFakultas(); // Refresh data fakultas
-          this.fakultasForm.reset(); // Reset formulir
-          this.isSubmitting = false; // Reset status submitting
 
-          // Tutup modal setelah data berhasil ditambahkan
-          const modalElement = document.getElementById(
-            'tambahFakultasModal'
-          ) as HTMLElement;
-          if (modalElement) {
-            const modalInstance =
-              bootstrap.Modal.getInstance(modalElement) ||
-              new bootstrap.Modal(modalElement);
-            modalInstance.hide();
+      const token = localStorage.getItem('authToken');
+      const headers = { Authorization: `Bearer ${token}` };
 
-            // Hapus elemen backdrop jika ada
-            const backdrop = document.querySelector('.modal-backdrop');
-            if (backdrop) {
-              backdrop.remove();
+      this.http
+        .post(this.apiFakultasUrl, this.fakultasForm.value, { headers })
+        .subscribe({
+          next: (response) => {
+            console.log('Data berhasil ditambahkan:', response);
+            this.getFakultas(); // Refresh data fakultas
+            this.fakultasForm.reset(); // Reset formulir
+            this.isSubmitting = false; // Reset status submitting
+
+            // Tutup modal setelah data berhasil ditambahkan
+            const modalElement = document.getElementById(
+              'tambahFakultasModal'
+            ) as HTMLElement;
+            if (modalElement) {
+              const modalInstance =
+                bootstrap.Modal.getInstance(modalElement) ||
+                new bootstrap.Modal(modalElement);
+              modalInstance.hide();
+
+              // Hapus elemen backdrop jika ada
+              const backdrop = document.querySelector('.modal-backdrop');
+              if (backdrop) {
+                backdrop.remove();
+              }
+
+              // Pulihkan scroll pada body
+              document.body.classList.remove('modal-open');
+              document.body.style.overflow = '';
+              document.body.style.paddingRight = '';
             }
-
-            // Pulihkan scroll pada body
-            document.body.classList.remove('modal-open');
-            document.body.style.overflow = '';
-            document.body.style.paddingRight = '';
-          }
-        },
-        error: (err) => {
-          console.error('Error menambahkan fakultas:', err);
-          this.isSubmitting = false;
-        },
-      });
+          },
+          error: (err) => {
+            console.error('Error menambahkan fakultas:', err);
+            this.isSubmitting = false;
+          },
+        });
     }
   }
 
@@ -106,7 +115,11 @@ export class FakultasComponent implements OnInit {
   // Method untuk mendapatkan data Fakultas berdasarkan ID
   getFakultasById(_id: string): void {
     this.editFakultasId = _id; // Menyimpan ID Fakultas yang dipilih
-    this.http.get(`${this.apiFakultasUrl}/${_id}`).subscribe({
+
+    const token = localStorage.getItem('authToken');
+    const headers = { Authorization: `Bearer ${token}` };
+
+    this.http.get(`${this.apiFakultasUrl}/${_id}`, { headers }).subscribe({
       next: (data: any) => {
         // Isi form dengan data yang diterima dari API
         this.fakultasForm.patchValue({
@@ -136,10 +149,14 @@ export class FakultasComponent implements OnInit {
     if (this.fakultasForm.valid) {
       this.isSubmitting = true;
 
+      const token = localStorage.getItem('authToken');
+      const headers = { Authorization: `Bearer ${token}` };
+
       this.http
         .put(
           `${this.apiFakultasUrl}/${this.editFakultasId}`,
-          this.fakultasForm.value
+          this.fakultasForm.value,
+          { headers }
         )
         .subscribe({
           next: (response) => {
@@ -170,7 +187,10 @@ export class FakultasComponent implements OnInit {
   deleteFakultas(_id: string): void {
     if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
       // Konfirmasi penghapusan
-      this.http.delete(`${this.apiFakultasUrl}/${_id}`).subscribe({
+      const token = localStorage.getItem('authToken');
+      const headers = { Authorization: `Bearer ${token}` };
+
+      this.http.delete(`${this.apiFakultasUrl}/${_id}`, { headers }).subscribe({
         next: () => {
           console.log(`Fakultas dengan ID ${_id} berhasil dihapus`);
           this.getFakultas(); // Refresh data Fakultas setelah penghapusan
