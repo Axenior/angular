@@ -190,10 +190,14 @@ export class MahasiswaComponent implements OnInit {
     if (this.mahasiswaForm.valid) {
       this.isSubmitting = true;
 
+      const token = localStorage.getItem('authToken');
+      const headers = { Authorization: `Bearer ${token}` };
+
       this.http
         .put(
           `${this.apiMahasiswaUrl}/${this.editMahasiswaId}`,
-          this.mahasiswaForm.value
+          this.mahasiswaForm.value,
+          { headers }
         )
         .subscribe({
           next: (response) => {
